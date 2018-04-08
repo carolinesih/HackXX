@@ -1,18 +1,31 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Valve.VR;
+using Valve.VR.InteractionSystem;
 
 public class CameraControl : MonoBehaviour {
 
-    public float moveSpeed = 1f;
+    //public float moveSpeed = 1f;
 
-	// Use this for initialization
-	void Start () {
-		
-	}
+    public GameObject player;
+
+    SteamVR_Controller.Device device;
+    SteamVR_TrackedObject controller;
+
+    Vector2 touchpad;
+
+    private float sensitivityX = 1.5F;
+    private Vector3 playerPos;
+
+    // Use this for initialization
+    void Start () {
+        controller = gameObject.GetComponent<SteamVR_TrackedObject>();
+    }
 	
 	// Update is called once per frame
 	void Update () {
+        //keyboard input
         if (Input.GetKey(KeyCode.UpArrow))
         {
             transform.Translate(Vector3.forward * Time.deltaTime);
@@ -22,5 +35,41 @@ public class CameraControl : MonoBehaviour {
         {
             transform.Translate(-Vector3.forward * Time.deltaTime);
         }
-	}
+
+        //vive input
+        if(controller == null)
+        {
+            print("Controller is null");
+        }
+        device = SteamVR_Controller.Input((int)controller.index);
+        //If finger is on touchpad
+        if (device.GetTouch(SteamVR_Controller.ButtonMask.Touchpad))
+        {
+            //Read the touchpad values
+            touchpad = device.GetAxis(EVRButtonId.k_EButton_SteamVR_Touchpad);
+            print(touchpad);
+
+            /*
+            // Handle movement via touchpad
+            if (touchpad.y > 0.2f || touchpad.y < -0.2f)
+            {
+                // Move Forward
+                player.transform.position -= player.transform.forward * Time.deltaTime * (touchpad.y * 5f);
+
+                // Adjust height to terrain height at player positin
+                playerPos = player.transform.position;
+                playerPos.y = Terrain.activeTerrain.SampleHeight(player.transform.position);
+                player.transform.position = playerPos;
+            }
+
+            // handle rotation via touchpad
+            if (touchpad.x > 0.3f || touchpad.x < -0.3f)
+            {
+                player.transform.Rotate(0, touchpad.x * sensitivityX, 0);
+            }*/
+
+            //Debug.Log ("Touchpad X = " + touchpad.x + " : Touchpad Y = " + touchpad.y);
+        }
+    }
 }
+
